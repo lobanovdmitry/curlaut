@@ -3,13 +3,13 @@ use crate::cli::clap_config::KeycloakCommand::SetDefault;
 use crate::cli::auth_config_file_path;
 use crate::keycloak::keycloak_config::KeycloakConfig;
 use crate::keycloak::keycloak_registry::KeycloakRegistry;
-use crate::output::curlautOutput;
+use crate::output::CurlautOutput;
 use std::io::Write;
 use KeycloakCommand::{Add, List, Remove};
 
 pub fn execute_command(
     command: KeycloakCommand,
-    io: &mut impl curlautOutput,
+    io: &mut impl CurlautOutput,
 ) -> anyhow::Result<()> {
     let config_file_path = auth_config_file_path()?;
     let config_file_path = config_file_path.as_path();

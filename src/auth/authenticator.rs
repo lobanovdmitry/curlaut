@@ -1,7 +1,7 @@
 use crate::auth::HttpAuthorization;
 use crate::keycloak::keycloak_config::KeycloakConfig;
-use crate::output::curlautOutput;
-use anyhow::{Context, anyhow, bail};
+use crate::output::CurlautOutput;
+use anyhow::{bail, Context};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::io::Write;
@@ -19,7 +19,7 @@ impl HttpAuthorization for JwtToken {
     }
 }
 
-pub fn get_jwt(config: &KeycloakConfig, io: &mut impl curlautOutput) -> anyhow::Result<JwtToken> {
+pub fn get_jwt(config: &KeycloakConfig, io: &mut impl CurlautOutput) -> anyhow::Result<JwtToken> {
     let http_client = reqwest::blocking::Client::new();
     let keycloak_url = &config.url.0;
     let token_url = build_token_url(keycloak_url, &config.realm)

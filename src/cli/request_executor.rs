@@ -3,7 +3,7 @@ use crate::auth::authenticator::JwtToken;
 use crate::cli::auth_config_file_path;
 use crate::cli::clap_config::HttpRequestArgs;
 use crate::keycloak::keycloak_registry::KeycloakRegistry;
-use crate::output::curlautOutput;
+use crate::output::CurlautOutput;
 use crate::request::request_executor::execute;
 use crate::request::request_spec::{
     HttpRequestBody, HttpRequestHeaders, HttpRequestMethod, HttpRequestSpec,
@@ -15,7 +15,7 @@ use url::Url;
 pub fn execute_request(
     method: HttpRequestMethod,
     args: HttpRequestArgs,
-    io: &mut impl curlautOutput,
+    io: &mut impl CurlautOutput,
 ) -> anyhow::Result<()> {
     if args.verbose {
         io.enable_verbose();

@@ -14,7 +14,7 @@ impl CurlautStdOutput {
     }
 }
 
-impl crate::output::curlautOutput for CurlautStdOutput {
+impl crate::output::CurlautOutput for CurlautStdOutput {
     fn enable_verbose(&mut self) {
         self.err.enabled = true;
     }

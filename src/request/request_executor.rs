@@ -1,5 +1,5 @@
 use crate::auth::HttpAuthorization;
-use crate::output::curlautOutput;
+use crate::output::CurlautOutput;
 use crate::request::request_spec::{
     HttpRequestBody, HttpRequestHeaders, HttpRequestMethod, HttpRequestSpec,
 };
@@ -14,7 +14,7 @@ use std::io::Write;
 
 pub fn execute(
     request_spec: HttpRequestSpec,
-    io: &mut impl curlautOutput,
+    io: &mut impl CurlautOutput,
 ) -> Result<(), RequestExecutionError> {
     log_request_starts(&request_spec, io);
 
@@ -43,7 +43,7 @@ pub fn execute(
     Ok(())
 }
 
-fn log_request_starts(request_spec: &HttpRequestSpec, io: &mut impl curlautOutput) {
+fn log_request_starts(request_spec: &HttpRequestSpec, io: &mut impl CurlautOutput) {
     writeln!(
         io.verbose(),
         "> {} {} HTTP/1.1",
@@ -52,7 +52,7 @@ fn log_request_starts(request_spec: &HttpRequestSpec, io: &mut impl curlautOutpu
     );
 }
 
-fn log_request_content(request: &Request, io: &mut impl curlautOutput) {
+fn log_request_content(request: &Request, io: &mut impl CurlautOutput) {
     request.headers().iter().for_each(|(key, value)| {
         writeln!(io.verbose(), "> {key:?}: {value:?}");
     });
@@ -95,7 +95,7 @@ fn to_reqwest_method(method: &HttpRequestMethod) -> Method {
 
 fn log_response(
     response: Response,
-    io: &mut impl curlautOutput,
+    io: &mut impl CurlautOutput,
 ) -> Result<(), RequestExecutionError> {
     let response_status = &response.status();
     writeln!(io.verbose(), "< HTTP/1.1 {response_status}");
