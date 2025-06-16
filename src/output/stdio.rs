@@ -1,15 +1,15 @@
 use std::io::{Write, stderr, stdout};
 
 pub struct CurlautStdOutput {
-    out: curlautStdOut,
-    err: curlautStdErr,
+    out: CurlautStdOut,
+    err: CurlautStdErr,
 }
 
 impl CurlautStdOutput {
     pub fn new() -> Self {
         Self {
-            out: curlautStdOut {},
-            err: curlautStdErr { enabled: false },
+            out: CurlautStdOut {},
+            err: CurlautStdErr { enabled: false },
         }
     }
 }
@@ -28,13 +28,13 @@ impl crate::output::curlautOutput for CurlautStdOutput {
     }
 }
 
-struct curlautStdOut {}
+struct CurlautStdOut {}
 
-struct curlautStdErr {
+struct CurlautStdErr {
     enabled: bool,
 }
 
-impl Write for curlautStdOut {
+impl Write for CurlautStdOut {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         stdout().write(buf)
     }
@@ -44,7 +44,7 @@ impl Write for curlautStdOut {
     }
 }
 
-impl Write for curlautStdErr {
+impl Write for CurlautStdErr {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         if self.enabled {
             return stderr().write(buf);
