@@ -12,7 +12,7 @@ Feature
 
 for example:
 ```shell
-./curlaut --auth prod --json https://prod/api/v1/resource | jq
+./curlaut POST --json-body '{"key":"value"}' https://prod/api/v1/resource -v | jq
 ```
 
 Modules

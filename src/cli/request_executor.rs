@@ -26,7 +26,7 @@ pub fn execute_request(
         .get_default()
         .with_context(|| "No default keycloak config")?;
     let jwt = authenticator::get_jwt(&keycloak_config, io)?;
-    let request = build_request_spec(&args, method, jwt);
+    let request = build_request_spec(&args, method, jwt)?;
     execute(request, io)?;
     Ok(())
 }
@@ -35,9 +35,9 @@ fn build_request_spec(
     args: &HttpRequestArgs,
     method: HttpRequestMethod,
     auth: JwtToken,
-) -> HttpRequestSpec {
-    HttpRequestSpec {
-        url: Url::parse(&args.url).unwrap(),
+) -> anyhow::Result<HttpRequestSpec> {
+    Ok(HttpRequestSpec {
+        url: Url::parse(&args.url)?,
         method,
         headers: parse_headers(args.headers.iter().map(|s| s.as_str()).collect()),
         body: match &args.json_body {
@@ -45,7 +45,7 @@ fn build_request_spec(
             Some(body) => HttpRequestBody::Json(body),
         },
         authorization: Box::new(auth),
-    }
+    })
 }
 
 fn parse_headers(headers: Vec<&str>) -> HttpRequestHeaders {
