@@ -6,13 +6,13 @@ use curlaut::cli::clap_config::MainCommand::{
     Config, DeleteRequest, GetRequest, PostRequest, PutRequest,
 };
 use curlaut::cli::request_executor::execute_request;
-use curlaut::output::stdio::curlautStdOutput;
+use curlaut::output::stdio::CurlautStdOutput;
 use curlaut::request::request_spec::HttpRequestMethod::{DELETE, GET, POST, PUT};
 use std::io::Write;
 use std::process::exit;
 
 fn main() {
-    let mut io = curlautStdOutput::new();
+    let mut io = CurlautStdOutput::new();
     let cli = Cli::parse();
     let result = match cli.command {
         Config { command } => execute_command(command, &mut io),

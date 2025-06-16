@@ -1,11 +1,11 @@
 use std::io::{Write, stderr, stdout};
 
-pub struct curlautStdOutput {
+pub struct CurlautStdOutput {
     out: curlautStdOut,
     err: curlautStdErr,
 }
 
-impl curlautStdOutput {
+impl CurlautStdOutput {
     pub fn new() -> Self {
         Self {
             out: curlautStdOut {},
@@ -14,7 +14,7 @@ impl curlautStdOutput {
     }
 }
 
-impl crate::output::curlautOutput for curlautStdOutput {
+impl crate::output::curlautOutput for CurlautStdOutput {
     fn enable_verbose(&mut self) {
         self.err.enabled = true;
     }
