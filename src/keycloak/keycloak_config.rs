@@ -1,6 +1,5 @@
 use crate::keycloak::KeycloakRegistryError;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::cell::Cell;
 use std::fmt::Formatter;
 use url::Url;
 
@@ -14,12 +13,12 @@ pub struct KeycloakConfig {
     pub client_secret: String,
     pub username: String,
     pub password: String,
-    pub(in crate::keycloak) default: Cell<bool>,
+    pub(in crate::keycloak) default: bool,
 }
 
 impl std::fmt::Display for KeycloakConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.default.get() {
+        if self.default {
             write!(f, "* ")?;
         }
         write!(f, "Keycloak '{}'", self.alias)?;
@@ -78,7 +77,7 @@ impl KeycloakConfig {
             client_secret: client_secret.to_string(), // empty string is ok
             username: Self::require_non_empty("username", username)?,
             password: Self::require_non_empty("password", password)?,
-            default: Cell::new(default),
+            default,
         };
         Ok(config)
     }

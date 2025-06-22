@@ -26,7 +26,7 @@ impl KeycloakRegistry {
         let mut keycloaks = Self::new_empty();
         let mut default_alias = None;
         for config in keycloak_configs {
-            if config.default.get() {
+            if config.default {
                 default_alias = Some(config.alias.clone());
             }
             keycloaks.add_keycloak(config)?;
@@ -59,7 +59,7 @@ impl KeycloakRegistry {
     pub fn add_keycloak(&mut self, config: KeycloakConfig) -> Result<(), KeycloakRegistryError> {
         log::info!("Adding keycloak for config `{:?}`", config);
         let alias = config.alias.to_owned();
-        let is_default = config.default.get();
+        let is_default = config.default;
         if self.keycloak_by_alias.contains_key(&config.alias) {
             return Err(KeycloakRegistryError::AliasAlreadyExists(alias));
         }
@@ -96,13 +96,17 @@ impl KeycloakRegistry {
             .unwrap_or(false);
         if !is_default_the_same {
             // unset current default
-            self.get_default()
-                .iter()
-                .for_each(|curr_default| curr_default.default.set(false));
+            self.default_alias
+                .as_ref()
+                .map(|alias| self.keycloak_by_alias.get_mut(alias))
+                .flatten()
+                .map(|keycloak| keycloak.default = false);
             // set new default
-            self.find_keycloak(new_default_alias)
-                .iter()
-                .for_each(|new_default| new_default.default.set(true));
+            let new_default = self
+                .keycloak_by_alias
+                .get_mut(new_default_alias)
+                .expect("Keycloak with alias `{new_default_alias}` not found}`");
+            new_default.default = true;
             // set cached value
             self.default_alias = Some(new_default_alias.to_string());
         }
