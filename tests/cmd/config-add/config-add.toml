@@ -1,0 +1,7 @@
+bin.name = "curlaut"
+args = "config add --alias local --realm dlobanov --username user --password password http://localhost:8080 --default --client-id dlobanov_client --client-secret ''"
+fs.cwd = "fs"
+fs.sandbox = true
+
+[env.add]
+HOME = "."

@@ -96,11 +96,9 @@ impl KeycloakRegistry {
             .unwrap_or(false);
         if !is_default_the_same {
             // unset current default
-            self.default_alias
-                .as_ref()
-                .map(|alias| self.keycloak_by_alias.get_mut(alias))
-                .flatten()
-                .map(|keycloak| keycloak.default = false);
+            if let Some(current_default) = self.get_default_mut() {
+                current_default.default = false;
+            }
             // set new default
             let new_default = self
                 .keycloak_by_alias
@@ -110,5 +108,11 @@ impl KeycloakRegistry {
             // set cached value
             self.default_alias = Some(new_default_alias.to_string());
         }
+    }
+
+    fn get_default_mut(&mut self) -> Option<&mut KeycloakConfig> {
+        self.default_alias
+            .as_ref()
+            .and_then(|alias| self.keycloak_by_alias.get_mut(alias))
     }
 }

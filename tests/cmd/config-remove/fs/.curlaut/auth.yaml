@@ -1,0 +1,8 @@
+- alias: local
+  url: http://localhost:8080/
+  realm: dlobanov
+  clientId: dlobanov_client
+  clientSecret: ''
+  username: user
+  password: password
+  default: true
