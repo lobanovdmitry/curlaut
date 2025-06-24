@@ -21,7 +21,7 @@ impl HttpAuthorization for JwtToken {
 
 pub fn get_jwt(config: &KeycloakConfig, io: &mut impl CurlautOutput) -> anyhow::Result<JwtToken> {
     let http_client = reqwest::blocking::Client::new();
-    let keycloak_url = &config.url.0;
+    let keycloak_url = &config.url;
     let token_url = build_token_url(keycloak_url, &config.realm)
         .with_context(|| format!("Failed to build auth token url to {}", config.alias))?;
     let mut params = HashMap::new();

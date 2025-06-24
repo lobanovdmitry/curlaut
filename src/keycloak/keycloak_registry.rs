@@ -1,11 +1,8 @@
-use crate::keycloak::KeycloakRegistryError;
-use crate::keycloak::KeycloakRegistryError::{
-    CannotOpenConfigFile, CannotUnderstandConfigFile, CannotWriteConfigFile,
-};
 use crate::keycloak::keycloak_config::KeycloakConfig;
+use anyhow::{Context, bail};
+use linked_hash_map::LinkedHashMap;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
-use linked_hash_map::LinkedHashMap;
 
 pub struct KeycloakRegistry {
     keycloak_by_alias: LinkedHashMap<String, KeycloakConfig>, // alias -> keycloak
@@ -13,16 +10,10 @@ pub struct KeycloakRegistry {
 }
 
 impl KeycloakRegistry {
-    pub fn load_from_file(path: &Path) -> Result<KeycloakRegistry, KeycloakRegistryError> {
-        let config_file = File::open(path).map_err(|e| CannotOpenConfigFile {
-            path: path.display().to_string(),
-            origin: e,
-        })?;
+    pub fn load_from_file(path: &Path) -> anyhow::Result<KeycloakRegistry> {
+        let config_file = File::open(path).with_context(|| "Can't open config file for read")?;
         let keycloak_configs: Vec<KeycloakConfig> =
-            serde_yaml::from_reader(config_file).map_err(|e| CannotUnderstandConfigFile {
-                path: path.display().to_string(),
-                origin: e,
-            })?;
+            serde_yaml::from_reader(config_file).with_context(|| "Can't parse config file")?;
         let mut keycloaks = Self::new_empty();
         let mut default_alias = None;
         for config in keycloak_configs {
@@ -35,18 +26,16 @@ impl KeycloakRegistry {
         Ok(keycloaks)
     }
 
-    pub fn save_to_file(self, path: &Path) -> Result<(), KeycloakRegistryError> {
+    pub fn save_to_file(self, path: &Path) -> anyhow::Result<()> {
         let config_file = OpenOptions::new()
             .write(true)
             .truncate(true)
             .open(path)
-            .map_err(|e| CannotOpenConfigFile {
-                path: path.display().to_string(),
-                origin: e,
-            })?;
+            .with_context(|| "Can't open config file for write")?;
         let keycloak_configs: Vec<&KeycloakConfig> = self.keycloak_by_alias.values().collect();
         serde_yaml::to_writer(config_file, &keycloak_configs)
-            .map_err(|e| CannotWriteConfigFile { origin: e })
+            .with_context(|| "Can't write config file")?;
+        Ok(())
     }
 
     pub fn new_empty() -> Self {
@@ -56,12 +45,12 @@ impl KeycloakRegistry {
         }
     }
 
-    pub fn add_keycloak(&mut self, config: KeycloakConfig) -> Result<(), KeycloakRegistryError> {
+    pub fn add_keycloak(&mut self, config: KeycloakConfig) -> anyhow::Result<()> {
         log::info!("Adding keycloak for config `{:?}`", config);
         let alias = config.alias.to_owned();
         let is_default = config.default;
         if self.keycloak_by_alias.contains_key(&config.alias) {
-            return Err(KeycloakRegistryError::AliasAlreadyExists(alias));
+            bail!("Alias `{}` already exists", alias);
         }
         self.keycloak_by_alias.insert(alias.to_owned(), config);
         if is_default {

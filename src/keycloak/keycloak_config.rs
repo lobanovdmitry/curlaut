@@ -1,6 +1,7 @@
-use crate::keycloak::KeycloakRegistryError;
+use anyhow::{Context, bail};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;
+use std::ops::Deref;
 use url::Url;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,7 +37,14 @@ impl std::fmt::Display for KeycloakConfig {
 }
 
 #[derive(Debug)]
-pub struct MyUrl(pub Url); // just NewType for Url serde
+pub struct MyUrl(Url); // just NewType for Url serde
+
+impl Deref for MyUrl {
+    type Target = Url;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl Serialize for MyUrl {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -68,7 +76,7 @@ impl KeycloakConfig {
         username: &str,
         password: &str,
         default: bool,
-    ) -> Result<KeycloakConfig, KeycloakRegistryError> {
+    ) -> anyhow::Result<KeycloakConfig> {
         let config = KeycloakConfig {
             alias: Self::require_non_empty("alias", alias)?,
             url: MyUrl(Self::require_url(url)?),
@@ -82,20 +90,14 @@ impl KeycloakConfig {
         Ok(config)
     }
 
-    fn require_non_empty(
-        property: &'static str,
-        value: &str,
-    ) -> Result<String, KeycloakRegistryError> {
+    fn require_non_empty(property: &'static str, value: &str) -> anyhow::Result<String> {
         if value.is_empty() {
-            return Err(KeycloakRegistryError::ConfigPropertyCannotBeBlank(property));
+            bail!("Config property '{}' must not be empty", property);
         }
         Ok(value.to_owned())
     }
 
-    fn require_url(url: &str) -> Result<Url, KeycloakRegistryError> {
-        Url::parse(url).map_err(|e| KeycloakRegistryError::InvalidKeycloakUrl {
-            url: url.to_owned(),
-            origin: e,
-        })
+    fn require_url(url: &str) -> anyhow::Result<Url> {
+        Url::parse(url).with_context(|| format!("Invalid URL '{}'", url))
     }
 }
