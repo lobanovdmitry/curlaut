@@ -1,4 +1,3 @@
-bin.name = "curlaut"
 args = "config set-default local-non-default"
 fs.cwd = "fs"
 

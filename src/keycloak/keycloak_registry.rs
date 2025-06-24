@@ -3,12 +3,12 @@ use crate::keycloak::KeycloakRegistryError::{
     CannotOpenConfigFile, CannotUnderstandConfigFile, CannotWriteConfigFile,
 };
 use crate::keycloak::keycloak_config::KeycloakConfig;
-use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
+use linked_hash_map::LinkedHashMap;
 
 pub struct KeycloakRegistry {
-    keycloak_by_alias: HashMap<String, KeycloakConfig>, // alias -> keycloak
+    keycloak_by_alias: LinkedHashMap<String, KeycloakConfig>, // alias -> keycloak
     default_alias: Option<String>,
 }
 
@@ -51,7 +51,7 @@ impl KeycloakRegistry {
 
     pub fn new_empty() -> Self {
         Self {
-            keycloak_by_alias: HashMap::new(),
+            keycloak_by_alias: LinkedHashMap::new(),
             default_alias: None,
         }
     }
