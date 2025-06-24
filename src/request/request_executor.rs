@@ -22,7 +22,7 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
     let request = rb.build().with_context(|| "Failed to build http request")?;
 
     // log request
-    log_request_content(&request, io);
+    log_request_content(&request, io)?;
 
     // do execute request
     let response = http_client
