@@ -4,6 +4,7 @@ use crate::output::CurlautOutput;
 use anyhow::{bail, Context};
 use serde_json::Value;
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::io::Write;
 use std::time::Duration;
 use url::Url;
@@ -16,6 +17,12 @@ pub struct JwtToken {
 impl HttpAuthorization for JwtToken {
     fn get_authorization_value(&self) -> String {
         self.token_value.clone()
+    }
+}
+
+impl Display for JwtToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.token_value)
     }
 }
 

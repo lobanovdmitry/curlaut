@@ -7,6 +7,7 @@ use anyhow::Context;
 use reqwest::Method;
 use reqwest::blocking::{Request, RequestBuilder, Response};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
+use std::fmt::format;
 use std::io::Write;
 
 pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> anyhow::Result<()> {
@@ -71,7 +72,7 @@ fn add_headers(mut rb: RequestBuilder, headers: HttpRequestHeaders) -> RequestBu
 }
 
 fn add_auth(rb: RequestBuilder, http_auth: Box<dyn HttpAuthorization>) -> RequestBuilder {
-    rb.header(AUTHORIZATION, http_auth.get_authorization_value())
+    rb.header(AUTHORIZATION, format!("Bearer {}", http_auth))
 }
 
 fn add_body(rb: RequestBuilder, body: HttpRequestBody) -> RequestBuilder {
