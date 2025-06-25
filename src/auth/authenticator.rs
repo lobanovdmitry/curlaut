@@ -35,7 +35,7 @@ pub fn get_jwt(config: &KeycloakConfig, io: &mut impl CurlautOutput) -> anyhow::
     let get_jwt_request = http_client
         .post(token_url)
         .form(&params)
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(60))
         .build()
         .with_context(|| "Failed to build auth request")?;
     let jwt_result = http_client
@@ -53,7 +53,9 @@ pub fn get_jwt(config: &KeycloakConfig, io: &mut impl CurlautOutput) -> anyhow::
     let access_token = response
         .get("access_token")
         .with_context(|| "Missing access token")?;
-    let token_value = access_token.to_string();
+    let access_token_value = access_token.as_str()
+        .with_context(|| "Invalid access token value: must be a string")?;
+    let token_value = access_token_value.to_owned();
     Ok(JwtToken { token_value })
 }
 
