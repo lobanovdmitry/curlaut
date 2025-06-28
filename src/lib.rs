@@ -1,5 +1,5 @@
-pub mod cli;
 mod auth;
+pub mod cli;
 pub mod keycloak;
-pub mod request;
 pub mod output;
+pub mod request;
