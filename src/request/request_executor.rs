@@ -5,7 +5,7 @@ use crate::request::request_spec::{
 };
 use anyhow::Context;
 use reqwest::Method;
-use reqwest::blocking::{Request, RequestBuilder, Response};
+use reqwest::blocking::{Client, Request, RequestBuilder, Response};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use std::io::Write;
 use std::net::{IpAddr, ToSocketAddrs};
@@ -15,7 +15,7 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
     log_target_host(&request_spec, io)?;
     log_request_starts(&request_spec, io)?;
 
-    let http_client = reqwest::blocking::Client::new();
+    let http_client = build_http_client(&request_spec)?;
 
     // start build http request
     let mut rb = http_client.request(to_reqwest_method(&request_spec.method), request_spec.url);
@@ -24,7 +24,6 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
     rb = add_body(rb, request_spec.body);
     let request = rb.build().with_context(|| "Failed to build http request")?;
 
-    // log request
     log_request_content(&request, io)?;
 
     // do execute request
@@ -36,6 +35,17 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
     log_response(response, io)?;
 
     Ok(())
+}
+
+fn build_http_client(request_spec: &HttpRequestSpec) -> anyhow::Result<Client> {
+    let mut client_builder = reqwest::blocking::ClientBuilder::new();
+    client_builder = client_builder.timeout(request_spec.timeout);
+    if !request_spec.http1 {
+        // enable alpn to be possible to upgrade to http2
+        client_builder = client_builder.use_rustls_tls();
+    }
+    let http_client = client_builder.build()?;
+    Ok(http_client)
 }
 
 fn log_target_host(request: &HttpRequestSpec, io: &mut impl CurlautOutput) -> anyhow::Result<()> {
@@ -127,7 +137,7 @@ fn to_reqwest_method(method: &HttpRequestMethod) -> Method {
 
 fn log_response(response: Response, io: &mut impl CurlautOutput) -> anyhow::Result<()> {
     let response_status = &response.status();
-    writeln!(io.verbose(), "< HTTP/1.1 {response_status}")?;
+    writeln!(io.verbose(), "< {:?} {response_status}", response.version())?;
     for (key, value) in response.headers() {
         writeln!(io.verbose(), "< {key:?}: {value:?}")?;
     }

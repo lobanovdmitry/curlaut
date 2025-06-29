@@ -54,7 +54,7 @@ impl KeycloakRegistry {
         }
         self.keycloak_by_alias.insert(alias.to_owned(), config);
         if is_default {
-            self.set_default(&alias);
+            self.set_default(&alias)?;
         }
         Ok(())
     }
@@ -77,7 +77,7 @@ impl KeycloakRegistry {
         self.keycloak_by_alias.get(default)
     }
 
-    pub fn set_default(&mut self, new_default_alias: &str) {
+    pub fn set_default(&mut self, new_default_alias: &str) -> anyhow::Result<()> {
         let is_default_the_same = self
             .default_alias
             .as_ref()
@@ -92,11 +92,12 @@ impl KeycloakRegistry {
             let new_default = self
                 .keycloak_by_alias
                 .get_mut(new_default_alias)
-                .expect("Keycloak with alias `{new_default_alias}` not found}`");
+                .with_context(|| format!("Keycloak with alias `{new_default_alias}` not found`"))?;
             new_default.default = true;
             // set cached value
             self.default_alias = Some(new_default_alias.to_string());
         }
+        Ok(())
     }
 
     fn get_default_mut(&mut self) -> Option<&mut KeycloakConfig> {

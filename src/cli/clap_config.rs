@@ -42,6 +42,10 @@ pub struct HttpRequestArgs {
     pub json_body: Option<String>,
     #[arg(short, long)]
     pub verbose: bool,
+    #[arg(long, help = "Force use http 1.1")]
+    pub http1: bool,
+    #[arg(long, help = "Request timeout")]
+    pub timeout_millis: Option<u64>,
 }
 
 #[derive(clap::Subcommand, Debug)]

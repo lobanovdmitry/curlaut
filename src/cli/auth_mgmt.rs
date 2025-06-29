@@ -5,6 +5,7 @@ use crate::keycloak::keycloak_config::KeycloakConfig;
 use crate::keycloak::keycloak_registry::KeycloakRegistry;
 use crate::output::CurlautOutput;
 use std::io::Write;
+use anyhow::Context;
 use KeycloakCommand::{Add, List, Remove};
 
 pub fn execute_command(
@@ -36,7 +37,7 @@ pub fn execute_command(
                 password,
                 *default,
             )
-            .expect("Failed to create keycloak config");
+            .with_context(||"Failed to create keycloak config")?;
             keycloak_registry.add_keycloak(result)?;
             keycloak_registry.save_to_file(config_file_path)?;
             Ok(())
@@ -49,7 +50,7 @@ pub fn execute_command(
         }
         SetDefault { alias } => {
             writeln!(io.common(), "Set keycloak by default alias {alias}")?;
-            keycloak_registry.set_default(alias);
+            keycloak_registry.set_default(alias)?;
             keycloak_registry.save_to_file(config_file_path)?;
             Ok(())
         }

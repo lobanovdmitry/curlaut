@@ -10,7 +10,7 @@ path = "bin/curlaut.rs"
 [dependencies]
 anyhow = "1.0.98"
 clap = { version = "4.5.40", features = ["derive"] }
-reqwest = { version = "0.12.19", features = ["blocking", "json"] }
+reqwest = { version = "0.12.19", features = ["blocking", "json", "rustls-tls"] }
 thiserror = "2.0.12"
 url = "2.5.4"
 log = "0.4.27"

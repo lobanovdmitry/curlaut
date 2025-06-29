@@ -10,6 +10,7 @@ use crate::request::request_spec::{
 };
 use anyhow::Context;
 use std::collections::HashMap;
+use std::time::Duration;
 use url::Url;
 
 pub fn execute_request(
@@ -45,6 +46,11 @@ fn build_request_spec(
             Some(body) => HttpRequestBody::Json(body),
         },
         authorization: Box::new(auth),
+        http1: args.http1,
+        timeout: args
+            .timeout_millis
+            .map(Duration::from_millis)
+            .unwrap_or(Duration::from_secs(60)),
     })
 }
 

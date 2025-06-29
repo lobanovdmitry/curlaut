@@ -1,6 +1,7 @@
 use crate::auth::HttpAuthorization;
 use std::collections::HashMap;
 use std::fmt::Display;
+use std::time::Duration;
 use url::Url;
 
 pub struct HttpRequestSpec<'a> {
@@ -9,6 +10,8 @@ pub struct HttpRequestSpec<'a> {
     pub headers: HttpRequestHeaders<'a>,
     pub body: HttpRequestBody<'a>,
     pub authorization: Box<dyn HttpAuthorization>,
+    pub http1: bool,
+    pub timeout: Duration,
 }
 
 #[derive(Debug)]
