@@ -4,12 +4,15 @@ use crate::request::request_spec::{
     HttpRequestBody, HttpRequestHeaders, HttpRequestMethod, HttpRequestSpec,
 };
 use anyhow::Context;
+use reqwest::Method;
 use reqwest::blocking::{Request, RequestBuilder, Response};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
-use reqwest::Method;
 use std::io::Write;
+use std::net::{IpAddr, ToSocketAddrs};
+use url::Host;
 
 pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> anyhow::Result<()> {
+    log_target_host(&request_spec, io)?;
     log_request_starts(&request_spec, io)?;
 
     let http_client = reqwest::blocking::Client::new();
@@ -32,6 +35,36 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
     // log response
     log_response(response, io)?;
 
+    Ok(())
+}
+
+fn log_target_host(request: &HttpRequestSpec, io: &mut impl CurlautOutput) -> anyhow::Result<()> {
+    let host = request
+        .url
+        .host()
+        .ok_or_else(|| anyhow::anyhow!("No host specified"))?;
+    let port = request
+        .url
+        .port_or_known_default()
+        .ok_or_else(|| anyhow::anyhow!("No port specified"))?;
+    match host {
+        Host::Domain(host) => {
+            writeln!(io.verbose(), "* Host {host}")?;
+            let addr = (host, port)
+                .to_socket_addrs()
+                .with_context(|| format!("Failed to resolve host {host}"))?;
+            let ips: (Vec<IpAddr>, Vec<IpAddr>) =
+                addr.map(|addr| addr.ip()).partition(|ip| ip.is_ipv4());
+            if !ips.0.is_empty() {
+                writeln!(io.verbose(), "* IPv4: {:?}", ips.0)?;
+            }
+            if !ips.1.is_empty() {
+                writeln!(io.verbose(), "* IPv6: {:?}", ips.1)?;
+            }
+        }
+        Host::Ipv4(addr) => writeln!(io.verbose(), "* Host (IPv4): {addr}")?,
+        Host::Ipv6(addr) => writeln!(io.verbose(), "* Host (ipv6): {addr}")?,
+    }
     Ok(())
 }
 
