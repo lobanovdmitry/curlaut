@@ -51,6 +51,7 @@ fn build_request_spec(
             .timeout_millis
             .map(Duration::from_millis)
             .unwrap_or(Duration::from_secs(60)),
+        insecure: args.insecure,
     })
 }
 

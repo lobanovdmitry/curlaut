@@ -44,6 +44,10 @@ fn build_http_client(request_spec: &HttpRequestSpec) -> anyhow::Result<Client> {
         // enable alpn to be possible to upgrade to http2
         client_builder = client_builder.use_rustls_tls();
     }
+    if request_spec.insecure {
+        // ignore tls verification
+        client_builder = client_builder.danger_accept_invalid_certs(true);
+    }
     let http_client = client_builder.build()?;
     Ok(http_client)
 }

@@ -46,6 +46,8 @@ pub struct HttpRequestArgs {
     pub http1: bool,
     #[arg(long, help = "Request timeout")]
     pub timeout_millis: Option<u64>,
+    #[arg(long, help = "Don't verify TLS")]
+    pub insecure: bool,
 }
 
 #[derive(clap::Subcommand, Debug)]

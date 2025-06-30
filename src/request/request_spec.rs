@@ -12,6 +12,7 @@ pub struct HttpRequestSpec<'a> {
     pub authorization: Box<dyn HttpAuthorization>,
     pub http1: bool,
     pub timeout: Duration,
+    pub insecure: bool,
 }
 
 #[derive(Debug)]
