@@ -10,6 +10,8 @@ use crate::request::request_spec::{
 };
 use anyhow::Context;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
 use std::time::Duration;
 use url::Url;
 
@@ -41,10 +43,7 @@ fn build_request_spec(
         url: Url::parse(&args.url)?,
         method,
         headers: parse_headers(args.headers.iter().map(|s| s.as_str()).collect()),
-        body: match &args.json_body {
-            None => HttpRequestBody::Empty,
-            Some(body) => HttpRequestBody::Json(body),
-        },
+        body: get_body(args)?,
         authorization: Box::new(auth),
         http1: args.http1,
         timeout: args
@@ -65,4 +64,28 @@ fn parse_headers(headers: Vec<&str>) -> HttpRequestHeaders {
             acc
         });
     HttpRequestHeaders(map)
+}
+
+fn get_body(args: &HttpRequestArgs) -> anyhow::Result<HttpRequestBody> {
+    args.json_body
+        .as_ref()
+        .map(|json| Ok(HttpRequestBody::Json(json.to_owned())))
+        .or_else(|| {
+            args.json_body_file
+                .as_ref()
+                .map(|path| get_body_from_file(path))
+        })
+        .unwrap_or(Ok(HttpRequestBody::Empty))
+}
+
+fn get_body_from_file(body_file_path: &str) -> anyhow::Result<HttpRequestBody> {
+    File::open(body_file_path)
+        .with_context(|| "Can't open body file")
+        .and_then(|mut f| {
+            let mut buffer = String::new();
+            f.read_to_string(&mut buffer)
+                .with_context(|| "Can't read body file")?;
+            Ok(buffer)
+        })
+        .map(|buffer| HttpRequestBody::Json(buffer))
 }

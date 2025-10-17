@@ -126,7 +126,7 @@ fn add_body(rb: RequestBuilder, body: HttpRequestBody) -> RequestBuilder {
         HttpRequestBody::Empty => rb,
         HttpRequestBody::Json(s) => rb
             .header(CONTENT_TYPE, "application/json")
-            .body(s.to_owned()),
+            .body(s)
     }
 }
 

@@ -40,6 +40,8 @@ pub struct HttpRequestArgs {
     pub headers: Vec<String>,
     #[arg(value_name = "json string", long, help = "JSON Body")]
     pub json_body: Option<String>,
+    #[arg(value_name = "path to json file", long, help = "Path to file to be JSON Body")]
+    pub json_body_file: Option<String>,
     #[arg(short, long)]
     pub verbose: bool,
     #[arg(long, help = "Force use http 1.1")]

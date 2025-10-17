@@ -8,7 +8,7 @@ pub struct HttpRequestSpec<'a> {
     pub url: Url,
     pub method: HttpRequestMethod,
     pub headers: HttpRequestHeaders<'a>,
-    pub body: HttpRequestBody<'a>,
+    pub body: HttpRequestBody,
     pub authorization: Box<dyn HttpAuthorization>,
     pub http1: bool,
     pub timeout: Duration,
@@ -31,7 +31,7 @@ impl Display for HttpRequestMethod {
 
 pub struct HttpRequestHeaders<'a>(pub HashMap<&'a str, &'a str>);
 
-pub enum HttpRequestBody<'a> {
+pub enum HttpRequestBody {
     Empty,
-    Json(&'a str),
+    Json(String),
 }
