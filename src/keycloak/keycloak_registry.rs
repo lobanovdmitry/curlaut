@@ -1,5 +1,5 @@
 use crate::keycloak::keycloak_config::KeycloakConfig;
-use anyhow::{Context, bail};
+use anyhow::{bail, Context};
 use linked_hash_map::LinkedHashMap;
 use std::fs::{File, OpenOptions};
 use std::path::Path;

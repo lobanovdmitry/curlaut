@@ -4,9 +4,9 @@ use crate::request::request_spec::{
     HttpRequestBody, HttpRequestHeaders, HttpRequestMethod, HttpRequestSpec,
 };
 use anyhow::Context;
-use reqwest::Method;
 use reqwest::blocking::{Client, Request, RequestBuilder, Response};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
+use reqwest::Method;
 use std::io::Write;
 use std::net::{IpAddr, ToSocketAddrs};
 use url::Host;

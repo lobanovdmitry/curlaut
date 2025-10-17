@@ -1,4 +1,4 @@
-use anyhow::{Context, bail};
+use anyhow::{bail, Context};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;
 use std::ops::Deref;

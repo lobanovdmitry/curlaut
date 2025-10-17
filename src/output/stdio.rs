@@ -1,4 +1,4 @@
-use std::io::{Write, stderr, stdout};
+use std::io::{stderr, stdout, Write};
 
 pub struct CurlautStdOutput {
     out: CurlautStdOut,

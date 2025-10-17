@@ -1,11 +1,11 @@
+use crate::cli::auth_config_file_path;
 use crate::cli::clap_config::KeycloakCommand;
 use crate::cli::clap_config::KeycloakCommand::SetDefault;
-use crate::cli::auth_config_file_path;
 use crate::keycloak::keycloak_config::KeycloakConfig;
 use crate::keycloak::keycloak_registry::KeycloakRegistry;
 use crate::output::CurlautOutput;
-use std::io::Write;
 use anyhow::Context;
+use std::io::Write;
 use KeycloakCommand::{Add, List, Remove};
 
 pub fn execute_command(
@@ -37,7 +37,7 @@ pub fn execute_command(
                 password,
                 *default,
             )
-            .with_context(||"Failed to create keycloak config")?;
+                .with_context(|| "Failed to create keycloak config")?;
             keycloak_registry.add_keycloak(result)?;
             keycloak_registry.save_to_file(config_file_path)?;
             Ok(())
