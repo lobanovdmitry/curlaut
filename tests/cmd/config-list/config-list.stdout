@@ -1,4 +1,4 @@
 * Keycloak 'local':
-  [ url=http://localhost:8080/, realm=dlobanov, client_id=dlobanov_client, client_secret=, username=user, password=password ]
+  [ url=http://localhost:8089/, realm=dlobanov, client_id=dlobanov_client, client_secret=, username=user, password=password ]
 Keycloak 'local-non-default':
-  [ url=http://localhost:8080/, realm=dlobanov, client_id=dlobanov_client, client_secret=, username=user, password=password ]
+  [ url=http://localhost:8089/, realm=dlobanov, client_id=dlobanov_client, client_secret=, username=user, password=password ]

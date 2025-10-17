@@ -17,7 +17,7 @@ pub fn execute(request_spec: HttpRequestSpec, io: &mut impl CurlautOutput) -> an
 
     let http_client = build_http_client(&request_spec)?;
 
-    // start build http request
+    // start to build http request
     let mut rb = http_client.request(to_reqwest_method(&request_spec.method), request_spec.url);
     rb = add_headers(rb, request_spec.headers);
     rb = add_auth(rb, request_spec.authorization);
